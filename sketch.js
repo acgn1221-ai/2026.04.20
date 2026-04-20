@@ -25,12 +25,35 @@ function draw() {
   
   // --- 在副畫布 (pg) 上畫東西 ---
   pg.clear(); // 清除背景，使其變成透明，這樣才看得到下方的視訊
-  pg.fill(255, 255, 0); // 黃色
-  pg.noStroke();
-  pg.ellipse(pg.width / 2, pg.height / 2, 50, 50); // 在副畫布中心畫一個圓
-  pg.fill(0);
-  pg.textAlign(CENTER, CENTER);
-  pg.text("這是覆蓋圖層", pg.width / 2, pg.height / 2 + 40);
+  
+  // 讀取攝影機的像素資料
+  capture.loadPixels();
+
+  // 確保攝影機已經準備好並有像素資料
+  if (capture.pixels.length > 0) {
+    pg.textAlign(CENTER, CENTER);
+    pg.textSize(8);
+    pg.fill(0, 255, 0); // 設定文字顏色為綠色
+
+    // 以 20*20 為一個單位遍歷副畫布
+    for (let py = 0; py < pg.height; py += 20) {
+      for (let px = 0; px < pg.width; px += 20) {
+        // 將副畫布的座標 (px, py) 映射回攝影機原始影像的座標 (ix, iy)
+        let ix = floor(map(px, 0, pg.width, 0, capture.width));
+        let iy = floor(map(py, 0, pg.height, 0, capture.height));
+        
+        // 計算像素在 pixels 陣列中的位置 [R, G, B, A]
+        let index = (ix + iy * capture.width) * 4;
+        let r = capture.pixels[index];
+        let g = capture.pixels[index + 1];
+        let b = capture.pixels[index + 2];
+        
+        // 計算平均值並顯示
+        let avg = floor((r + g + b) / 3);
+        pg.text(avg, px + 10, py + 10);
+      }
+    }
+  }
 
   // 顯示影像
   push();
