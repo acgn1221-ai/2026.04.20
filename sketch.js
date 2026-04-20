@@ -20,7 +20,12 @@ function draw() {
   let y = (height - vHeight) / 2;
   
   // 顯示影像
-  image(capture, x, y, vWidth, vHeight);
+  push();
+  // 將繪製起點移至影像右側，並水平縮放 -1 倍來達成鏡像效果
+  translate(x + vWidth, y);
+  scale(-1, 1);
+  image(capture, 0, 0, vWidth, vHeight);
+  pop();
 }
 
 function windowResized() {
